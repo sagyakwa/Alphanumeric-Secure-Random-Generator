@@ -24,13 +24,10 @@ import java.util.List;
 
 public class TransactionGenerator {
     private static final String acceptedSymbols = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789";
-    // Returns a SecureRandom object of the specific algorithm supporting the specific instantiate parameters.
-    // This implementation in Java 9+ uses SeedGenerator as entropy input, which reads entropy from java.secritty.egd
-    // or /dev/random on linux/solaris/mac
-    private final SecureRandom secureRandom = SecureRandom.getInstance("DRBG", DrbgParameters.instantiation(256, DrbgParameters.Capability.PR_AND_RESEED, acceptedSymbols.getBytes()));
+    private final SecureRandom secureRandom = new SecureRandom();
 
-    public TransactionGenerator(File csvFile) throws NoSuchAlgorithmException {
-        File csvFile1 = csvFile.getAbsoluteFile();
+    public TransactionGenerator() {
+
     }
 
     /*
@@ -40,8 +37,6 @@ public class TransactionGenerator {
 
     // Read data from CSV File and generate random IDs in a list
     public List<String> generateRandomID(Path filePath) {
-
-        // TODO: Add a check for valid file existing.
 
         List<String> list = List.of();  // Default to empty list.
 
@@ -54,8 +49,10 @@ public class TransactionGenerator {
             BufferedReader reader = Files.newBufferedReader(filePath);
             Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(reader);
 
+            int i = 0;
             for (CSVRecord record : records) {
-                this.generateRandomAlphaNumeric(record.get(String.valueOf(record)));
+                list.add(this.generateRandomAlphaNumeric(record.get(i)));
+                i++;
                 // Alternatively if we want a specific record for the current line, we do `record.get("FirstName")`
             }
         } catch (IOException e) {
@@ -68,10 +65,17 @@ public class TransactionGenerator {
     // Implementation of random alphanumeric string containing 24 characters (no special characters)
     private String generateRandomAlphaNumeric(String customerInfoString) {
         // Set byte value
-        final byte[] byteValue = customerInfoString.getBytes(); // This is where we might use the csv file data where we get the bytes from one line and make a random with it
-        this.secureRandom.nextBytes(byteValue);
+        final byte[] byteValue = customerInfoString.getBytes(); // This is where we use the csv file data where we get the bytes from one line and make a random with it
+
+        try {  // set the SecureRandom algorithm to DRBG, with 512 bits of security strength, Predection resistance and reseeding, while using the customer info to generate random bytes
+            SecureRandom.getInstance("DRBG", DrbgParameters.instantiation(256, DrbgParameters.Capability.PR_AND_RESEED, byteValue));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+//        this.secureRandom.nextBytes(byteValue);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(byteValue);
         //right now, I get output like so: ACo-5qrnDXHDGQtBSuYo1b_mRrWjNDxEiRRFOIndJYQDTxU2KRWoyut9CAHCoSSbNx2IVRMOX90WPp_ECic
+//        return this.secureRandom.toString();
         //TODO: next task is to get it to 24 alphanumeric characters with no special charater such as - or _ ..
     }
 }
