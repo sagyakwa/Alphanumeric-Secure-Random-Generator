@@ -1,10 +1,9 @@
 /*
-The purpose of this program is to generate a 24 alphanumerical digit number. The SecureRandom library is best suited for
-a thread safe, true random generator. On Windows, the default implementation for SecureRandom is SHA1PRNG on Windows, and on Linux/Solaris/Mac,
-the default implementation is NativePRNG. SHA1PRNG can be 17 times fater than NativePRNG, but seeding options are fixed.
-Another implementation is AESCounterRNG, which is 10x faster than SHA1PRNG,
-and also continuously receives entropy from /dev/urandom, unlike the other PRNGs, but you sacrifice stability. THe DRBG
-implementation in Java 9+ returns a SecureRandom object of the specific algorithm supporting the specific instantiate parameters.
+The purpose of this program is to generate a secure 24 alphanumerical digit number. Since Math.Random and the Random() class are pseudo random generators, 
+it would not be secure. The SecureRandom library is best suited for a thread safe, true random generator. On Windows, the default implementation for SecureRandom 
+is SHA1PRNG on Windows, and on Linux/Solaris/Mac, the default implementation is NativePRNG. SHA1PRNG can be 17 times fater than NativePRNG, but seeding options are fixed.
+Another implementation is AESCounterRNG, which is 10x faster than SHA1PRNG, and also continuously receives entropy from /dev/urandom, unlike the other PRNGs, 
+but you sacrifice stability. THe DRBG implementation in Java 9+ returns a SecureRandom object of the specific algorithm supporting the specific instantiate parameters.
 The implementation's effective instantiated parameters must match this minimum request but is not necessarily the same.
  */
 
