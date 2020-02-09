@@ -36,6 +36,11 @@ public class TransactionGenerator {
     (20k nano seconds avg). This includes reading the file twice to initialize ArrayList.
      */
 
+    /**
+     * @param csvFilePath is the String path of the CSV file
+     * @return ArrayList of random alphanumerics
+     * @throws IOException in case CSV file doesn't exist, or there are any IO errors
+     */
     // Read data from CSV File and generate random IDs in a list
     protected List<String> generateRandomIDs(String csvFilePath) throws IOException {
         int initialCapacity = (int) Files.lines(Paths.get(csvFilePath)).count(); // get size of csv
