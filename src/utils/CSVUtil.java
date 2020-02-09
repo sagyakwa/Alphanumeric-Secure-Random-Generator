@@ -3,54 +3,72 @@ package utils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CSVUtils {
+/**
+ * The purpose of this program is to read and parse csv files, taking into account custom separators, or double quotes.
+ */
+public class CSVUtil {
     private static final char SEPARATOR_CHAR = ',';
     private static final char QUOTE_CHAR = '"';
     String csvFile;
-    private StringBuilder stringBuilder = new StringBuilder();
 
-    public CSVUtils(String csvFile) {
+    public CSVUtil(String csvFile) {
         this.csvFile = csvFile;
     }
 
+    /**
+     * @param cvsLine is the line to parse
+     * @return ArrayList object of parsed line
+     */
     public static String parseCSVLine(String cvsLine) {
         return String.valueOf(parseCSVLine(cvsLine, SEPARATOR_CHAR, QUOTE_CHAR));
     }
 
+    /**
+     * @param cvsLine is the line to parse
+     * @param separators is the custom separator
+     * @return ArrayList object of parsed line
+     */
     public static List<String> parseCSVLine(String cvsLine, char separators) {
         return parseCSVLine(cvsLine, separators, QUOTE_CHAR);
     }
 
+    /**
+     * @param cvsLine is the line to parse
+     * @param separators is the custom separator
+     * @param customQuote is the custom quote ("" or '')
+     * @return ArrayList object of parsed line
+     */
     public static List<String> parseCSVLine(String cvsLine, char separators, char customQuote) {
 
         List<String> result = new ArrayList<>();
 
-        //if empty, return!
+        // if empty, return!
         assert cvsLine != null;
 
         if (customQuote == ' ') {
             customQuote = QUOTE_CHAR;
         }
 
+        // change separators
         if (separators == ' ') {
             separators = SEPARATOR_CHAR;
         }
 
         StringBuffer curVal = new StringBuffer();
-        boolean inQuotes = false;
-        boolean startCollectChar = false;
+        boolean isInQuotes = false;
+        boolean startCollectingChar = false;
         boolean doubleQuotesInColumn = false;
 
         char[] chars = cvsLine.toCharArray();
 
         for (char ch : chars) {
-            if (inQuotes) {
-                startCollectChar = true;
+            if (isInQuotes) {
+                startCollectingChar = true;
                 if (ch == customQuote) {
-                    inQuotes = false;
+                    isInQuotes = false;
                     doubleQuotesInColumn = false;
                 } else {
-                    //Fixed : allow "" in custom quote enclosed
+                    // Fixed : allow "" in custom quote enclosed
                     if (ch == '\"') {
                         if (!doubleQuotesInColumn) {
                             curVal.append(ch);
@@ -63,15 +81,15 @@ public class CSVUtils {
             } else {
                 if (ch == customQuote) {
 
-                    inQuotes = true;
+                    isInQuotes = true;
 
-                    //Fixed : allow "" in empty quote enclosed
+                    // Fixed : allow "" in empty quote enclosed
                     if (chars[0] != '"' && customQuote == '\"') {
                         curVal.append('"');
                     }
 
-                    //double quotes in column will hit this!
-                    if (startCollectChar) {
+                    // Double quotes in column will hit this!
+                    if (startCollectingChar) {
                         curVal.append('"');
                     }
 
@@ -80,16 +98,16 @@ public class CSVUtils {
                     result.add(curVal.toString());
 
                     curVal = new StringBuffer();
-                    startCollectChar = false;
+                    startCollectingChar = false;
 
                 } else if (ch != '\r') {
                     if (ch == '\n') {
-                        //the end, break!
+                        // The end, break!
                         break;
                     } else {
                         curVal.append(ch);
                     }
-                }  //ignore LF characters
+                }  // Ignore LF characters
             }
         }
 
