@@ -10,22 +10,24 @@ instantiate parameters. The implementation's effective instantiated parameters m
 not necessarily the same.
  */
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
+import org.jetbrains.annotations.NotNull;
+import utils.CSVUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.DrbgParameters;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class TransactionGenerator {
-    private static final String acceptedSymbols = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789";
-    private final SecureRandom secureRandom = new SecureRandom();
+    private SecureRandom secureRandom = new SecureRandom();
+    private final int idLength = 24;  // Length of ID
+    private static final char DEFAULT_SEPARATOR = ',';
+    private static final char DEFAULT_QUOTE = '"';
+    private StringBuilder stringBuilder = new StringBuilder(idLength);
 
     public TransactionGenerator() {
 
@@ -33,59 +35,70 @@ public class TransactionGenerator {
 
     /*
     Using the Apache Commons CSV Library. Reading the CSV file for each row took less than 1 second in total(20k nano seconds).
-    This includes reading the file twice, as we do a scan to count the number of rows of data to set initial capacity of the collected instances.
      */
 
     // Read data from CSV File and generate random IDs in a list
-    protected List<String> generateRandomID(Path filePath) {
+    protected List<String> generateRandomIDs(String filePath) {
 
-        List<String> list = List.of();  // Default to empty list.
+        List<String> inputList = new ArrayList<>() {
+        };  // Default to empty list
+        String line;
 
         try {
-            // Prepare list.
-            int initialCapacity = (int) Files.lines(filePath).count();
-            list = new ArrayList<>(initialCapacity);
-
             // Read CSV file. For each row make random id for each line
-            BufferedReader reader = Files.newBufferedReader(filePath);
-            Iterable<CSVRecord> records = CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreEmptyLines().parse(reader);
-            final List<String> value = new ArrayList<>();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filePath))));
+            reader.readLine();  // Skip first line as it's the header
 
-//            String newLine;
-//            while((newLine = reader.readLine()) != null){
-//                System.out.println(newLine);
-//            }
-
-
-            for (CSVRecord record : records) {
-                LinkedHashMap<?, ?> recordMap = (LinkedHashMap<?, ?>) record.toMap();
-                Collection<?> n = recordMap.values();
-                System.out.println(n.toString());
-                list.add(this.generateRandomAlphaNumeric(record.toString()));
+            while ((line = reader.readLine()) != null) {
+                inputList.add(generateRandomAlphaNumeric(CSVUtils.parseCSVLine(line)));
                 break;  // TODO: remove
-                // Alternatively, if we want a specific record for the current line, we do `record.get("FirstName")`
+                // TODO: get generated IDs in a list
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return list;
+        return inputList;
     }
 
+    /**
+     * @param customerInfoString
+     * @return
+     */
     // Implementation of random alphanumeric string containing 24 characters (no special characters)
+    @NotNull
     private String generateRandomAlphaNumeric(String customerInfoString) {
-
-        byte[] customerBytes = new byte[18];
-
-        try {  // set the SecureRandom algorithm to DRBG, with 256 bits of security strength, Prediction resistance and reseeding, while using the customer info bytes as a personalization string
+        // set the SecureRandom algorithm to DRBG, with 256 bits of security strength, Prediction resistance and reseeding,
+        // while using the customer info bits as a personalization string. The personalization string is combined with a
+        // secret entropy input and (possibly) a nonce to produce a seed
+        System.out.println(customerInfoString);
+        try {
             SecureRandom.getInstance("DRBG", DrbgParameters.instantiation(256, DrbgParameters.Capability.PR_AND_RESEED, customerInfoString.getBytes(StandardCharsets.UTF_16)));
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        // Generate random bits into initialized array
-        this.secureRandom.nextBytes(customerBytes);
-        return Base64.getUrlEncoder().encodeToString(customerBytes);
 
-        //TODO: next task is to get it to 24 alphanumeric characters with no special character such as - or _ ..
+        // Go through and make 24 alphanumeric string
+        for(int i = 0; i < idLength; i++){
+            String acceptedSymbols = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789";
+            int randCharAt = this.secureRandom.nextInt(acceptedSymbols.length());
+            char randChar = acceptedSymbols.charAt(randCharAt);
+
+            stringBuilder.append(randChar);
+        }
+
+        return stringBuilder.toString();
+
+
+        /* Possible solution below: If Professor changes mind about alphanumeric and allows special characters, we
+        can use the nextBytes() method although nextInt() is O(1)
+         */
+//        byte[] customerBytes = new byte[18];
+        // Generate random bits into initialized array
+//        this.secureRandom.nextBytes(customerBytes);
+//        System.out.println(Arrays.toString(customerBytes));
+//        return Base64.getUrlEncoder().withoutPadding().encodeToString(customerBytes);
+        // returns random input like [OJDjyWPudSbUCvqDS-_nN]
+
     }
 }

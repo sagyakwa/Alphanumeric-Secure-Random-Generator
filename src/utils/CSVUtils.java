@@ -13,24 +13,6 @@ public class CSVUtils {
         this.csvFile = csvFile;
     }
 
-//    public String readAllCSVLines() throws IOException {
-//
-////        String csvFile = "customers.csv";
-//
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(this.csvFile))));
-//        String line;
-////        while ((line = reader.readLine()) != null) {
-////            List<String> lines = parseCSVLine(line);
-////            this.stringBuilder.append(lines.get(1));
-//////            System.out.println("Country [id= " + lines.get(0) + ", code= " + lines.get(1) + " , name=" + lines.get(2) + "]");
-////        }
-//        this.stringBuilder.append(Arrays.toString(new String[]{reader.readLine()}).replace(",", ""));
-//        this.stringBuilder.append(parseCSVLine(reader.readLine(), ','));
-//        reader.close();
-//
-//        return String.valueOf(this.stringBuilder);
-//    }
-
     public static String parseCSVLine(String cvsLine) {
         return String.valueOf(parseCSVLine(cvsLine, SEPARATOR_CHAR, QUOTE_CHAR));
     }
