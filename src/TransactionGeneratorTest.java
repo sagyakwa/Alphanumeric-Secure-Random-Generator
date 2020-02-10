@@ -36,11 +36,11 @@ public class TransactionGeneratorTest {
     }
 
     @Test
-    public void generateUsing1MillionRowCSV() {
+    public void generateUsingFiveHundredThousandRows() {
         TransactionGenerator tr = new TransactionGenerator();
         try {
             long startTime = System.nanoTime();
-            System.out.println(tr.generateRandomIDs(Paths.get("sample.csv").toString()));
+            System.out.println(tr.generateRandomIDs(Paths.get("500000 Sales Records.csv").toString()));
             long endTime = System.nanoTime();
             long elapsedTime = endTime - startTime;
             double elapsedTimeInSeconds = (double) Long.parseLong(String.valueOf(elapsedTime)) / 1_000_000_000;
