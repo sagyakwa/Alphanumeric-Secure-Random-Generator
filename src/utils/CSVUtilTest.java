@@ -42,7 +42,7 @@ public class CSVUtilTest {
 
         assertThat(result, IsNull.notNullValue());
         assertThat(result.size(), is(1));
-        assertThat(result.get(0), is("[10, AU, Australia]"));
+        assertThat(result.get(0), is("10AUAustralia"));
 
     }
 
@@ -54,7 +54,7 @@ public class CSVUtilTest {
 
         assertThat(result, IsNull.notNullValue());
         assertThat(result.size(), is(1));
-        assertThat(result.get(0), is("[10, AU, Aus\"tralia]"));
+        assertThat(result.get(0), is("10AUAus\"tralia"));
 
     }
 
@@ -65,7 +65,7 @@ public class CSVUtilTest {
         List<String> result = Collections.singletonList(CSVUtil.parseCSVLine(line));
         assertThat(result, IsNull.notNullValue());
         assertThat(result.size(), is(1));
-        assertThat(result.get(0), is("[10, AU, Aus,tralia]"));
+        assertThat(result.get(0), is("10AUAus,tralia"));
 
     }
 
