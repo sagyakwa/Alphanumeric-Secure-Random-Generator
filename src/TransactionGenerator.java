@@ -25,6 +25,7 @@ import java.util.List;
 
 
 public class TransactionGenerator {
+
     private SecureRandom secureRandom = new SecureRandom();
 
     public TransactionGenerator() {
@@ -44,7 +45,7 @@ public class TransactionGenerator {
     // Read data from CSV File and generate random IDs in a list
     protected List<String> generateRandomIDs(String csvFilePath) throws IOException {
         int initialCapacity = (int) Files.lines(Paths.get(csvFilePath)).count(); // get size of csv
-        List<String> idArray = new ArrayList<>(initialCapacity);  // Default to empty list
+        List<String> randomIDList = new ArrayList<>(initialCapacity);  // Default to empty list
         String line;
 
         try {
@@ -54,8 +55,7 @@ public class TransactionGenerator {
 
             while ((line = reader.readLine()) != null) {
 
-                idArray.add(generateRandomAlphaNumeric(CSVUtil.parseCSVLine(line)));
-//                System.out.println(idArray);
+                randomIDList.add(generateRandomAlphaNumeric(CSVUtil.parseCSVLine(line)));
             }
 
             reader.close(); // Close reader
@@ -64,7 +64,7 @@ public class TransactionGenerator {
         }
 
 
-        return idArray;
+        return randomIDList;
     }
 
     /**
@@ -73,6 +73,7 @@ public class TransactionGenerator {
      */
     // Implementation of random alphanumeric string containing 24 characters (no special characters)
     private String generateRandomAlphaNumeric(String customerInfoString) {
+        System.out.println(customerInfoString);
         // Length of ID
         int idLength = 24;
         StringBuilder stringBuilder = new StringBuilder(idLength);
@@ -94,6 +95,7 @@ public class TransactionGenerator {
 
             stringBuilder.append(randChar);
         }
+
 
         return stringBuilder.toString();
     }
