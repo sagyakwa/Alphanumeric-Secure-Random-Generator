@@ -1,6 +1,5 @@
 package utils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,7 +8,7 @@ import java.util.List;
 public class CSVUtil {
     private static final char SEPARATOR_CHAR = ',';
     private static final char QUOTE_CHAR = '"';
-    String csvFile;
+    private String csvFile;
 
     public CSVUtil(String csvFile) {
         this.csvFile = csvFile;
@@ -17,7 +16,7 @@ public class CSVUtil {
 
     /**
      * @param cvsLine is the line to parse
-     * @return ArrayList object of parsed line
+     * @return String object of parsed line
      */
     public static String parseCSVLine(String cvsLine) {
         return String.valueOf(parseCSVLine(cvsLine, SEPARATOR_CHAR, QUOTE_CHAR));
@@ -26,9 +25,9 @@ public class CSVUtil {
     /**
      * @param cvsLine is the line to parse
      * @param separators is the custom separator
-     * @return ArrayList object of parsed line
+     * @return StringBuilder object of parsed line
      */
-    public static List<String> parseCSVLine(String cvsLine, char separators) {
+    public static StringBuilder parseCSVLine(String cvsLine, char separators) {
         return parseCSVLine(cvsLine, separators, QUOTE_CHAR);
     }
 
@@ -36,11 +35,11 @@ public class CSVUtil {
      * @param cvsLine is the line to parse
      * @param separators is the custom separator
      * @param customQuote is the custom quote ("" or '')
-     * @return ArrayList object of parsed line
+     * @return StringBuilder object of parsed line
      */
-    public static List<String> parseCSVLine(String cvsLine, char separators, char customQuote) {
+    public static StringBuilder parseCSVLine(String cvsLine, char separators, char customQuote) {
 
-        List<String> result = new ArrayList<>();
+        StringBuilder result = new StringBuilder();
 
         // if empty, return!
         assert cvsLine != null;
@@ -68,7 +67,7 @@ public class CSVUtil {
                     isInQuotes = false;
                     doubleQuotesInColumn = false;
                 } else {
-                    // Fixed : allow "" in custom quote enclosed
+                    // Check and allow "" in custom quote enclosed
                     if (ch == '\"') {
                         if (!doubleQuotesInColumn) {
                             curVal.append(ch);
@@ -83,7 +82,7 @@ public class CSVUtil {
 
                     isInQuotes = true;
 
-                    // Fixed : allow "" in empty quote enclosed
+                    // Check and llow "" in empty quote enclosed
                     if (chars[0] != '"' && customQuote == '\"') {
                         curVal.append('"');
                     }
@@ -95,7 +94,7 @@ public class CSVUtil {
 
                 } else if (ch == separators) {
 
-                    result.add(curVal.toString());
+                    result.append(curVal.toString());
 
                     curVal = new StringBuffer();
                     startCollectingChar = false;
@@ -111,7 +110,7 @@ public class CSVUtil {
             }
         }
 
-        result.add(curVal.toString());
+        result.append(curVal.toString());
 
         return result;
     }
