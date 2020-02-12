@@ -11,11 +11,9 @@ instantiate parameters. The implementation's effective instantiated parameters m
 not necessarily the same.
  */
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
+import utils.CSVUtil;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -35,8 +33,8 @@ public class TransactionGenerator {
     }
 
     /*
-    Using the Custom CSV class, reading the customer.csv file for each row took less than 1 second in total
-    (0.0048298 seconds seconds avg). This includes reading the file twice to initialize ArrayList.
+    Using the Custom CSV class, reading the 1 million samples to 1.03 seconds average
+    This includes reading the file twice to initialize ArrayList.
      */
 
     /**
@@ -45,25 +43,20 @@ public class TransactionGenerator {
      * @throws IOException in case CSV file doesn't exist, or there are any IO errors
      */
     // Read data from CSV File and generate random IDs in a list
-    protected List<String> generateRandomIDs(String csvFilePath) throws IOException {
+    protected List<StringBuilder> generateRandomIDs(String csvFilePath) throws IOException {
         int initialCapacity = (int) Files.lines(Paths.get(csvFilePath)).count(); // get size of csv
-        List<String> randomIDList = new ArrayList<>(initialCapacity);  // Default to empty list
+        List<StringBuilder> randomIDList = new ArrayList<>(initialCapacity);  // Default to empty list
         String line;
 
         try {
-            BufferedReader reader = Files.newBufferedReader(Paths.get(csvFilePath));
-            Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse( reader );
+            // Read CSV file. For each row make random id for each line
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(csvFilePath))));
+            reader.readLine();  // Skip first line as it's the header
 
-            /********************************************/
-//            // Read CSV file. For each row make random id for each line
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(csvFilePath))));
-//            reader.readLine();  // Skip first line as it's the header
-//
-//            while ((line = reader.readLine()) != null) {
-//
-////                randomIDList.add(generateRandomAlphaNumeric(CSVUtil.parseCSVLine(line)));
-//                ;
-//            }
+            while ((line = reader.readLine()) != null) {
+//                randomIDList.add(line)
+                randomIDList.add(generateRandomAlphaNumeric(CSVUtil.parseCSVLine(line)));
+            }
 
             reader.close(); // Close reader
         } catch (IOException e) {
@@ -79,9 +72,8 @@ public class TransactionGenerator {
      * @return String of secure random alphanumeric
      */
     // Implementation of random alphanumeric string containing 24 characters (no special characters)
-    private String generateRandomAlphaNumeric(String customerInfoString) {
-        System.out.println(customerInfoString);
-        // Length of ID
+    private StringBuilder generateRandomAlphaNumeric(String customerInfoString) {
+        // Set length of random alphanumeric
         int idLength = 24;
         StringBuilder stringBuilder = new StringBuilder(idLength);
 
@@ -104,6 +96,6 @@ public class TransactionGenerator {
         }
 
 
-        return stringBuilder.toString();
+        return stringBuilder;
     }
 }

@@ -10,7 +10,7 @@ public class TransactionGeneratorTest {
         TransactionGenerator tr = new TransactionGenerator();
         try {
             long startTime = System.nanoTime();
-            System.out.println(tr.generateRandomIDs(Paths.get("customers.csv").toString()));
+            System.out.println(tr.generateRandomIDs(Paths.get("src/main/java/customers.csv").toString()));
             long endTime = System.nanoTime();
             long elapsedTime = endTime - startTime;
             double elapsedTimeInSeconds = (double) Long.parseLong(String.valueOf(elapsedTime)) / 1_000_000_000;
@@ -25,7 +25,7 @@ public class TransactionGeneratorTest {
         TransactionGenerator tr = new TransactionGenerator();
         try {
             long startTime = System.nanoTime();
-            System.out.println(tr.generateRandomIDs(Paths.get("sample.csv").toString()));
+            System.out.println(tr.generateRandomIDs(Paths.get("src/main/java/36_635 row sample.csv").toString()));
             long endTime = System.nanoTime();
             long elapsedTime = endTime - startTime;
             double elapsedTimeInSeconds = (double) Long.parseLong(String.valueOf(elapsedTime)) / 1_000_000_000;
@@ -40,7 +40,7 @@ public class TransactionGeneratorTest {
         TransactionGenerator tr = new TransactionGenerator();
         try {
             long startTime = System.nanoTime();
-            System.out.println(tr.generateRandomIDs(Paths.get("500000 Sales Records.csv").toString()));
+            System.out.println(tr.generateRandomIDs(Paths.get("src/main/java/500_000 Sales Records.csv").toString()));
             long endTime = System.nanoTime();
             long elapsedTime = endTime - startTime;
             double elapsedTimeInSeconds = (double) Long.parseLong(String.valueOf(elapsedTime)) / 1_000_000_000;

@@ -6,10 +6,8 @@ package utils;
 public class CSVUtil {
     private static final char SEPARATOR_CHAR = ',';
     private static final char QUOTE_CHAR = '"';
-    private String csvFile;
 
-    public CSVUtil(String csvFile) {
-        this.csvFile = csvFile;
+    public CSVUtil() {
     }
 
     /**
