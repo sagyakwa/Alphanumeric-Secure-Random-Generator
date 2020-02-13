@@ -34,7 +34,7 @@ public class TransactionGenerator {
 
     /*
     Using the Custom CSV class, reading the 1 million samples to 1.03 seconds average
-    This includes reading the file twice to initialize ArrayList.
+    This includes reading the file twice (to initialize ArrayList).
      */
 
     /**
