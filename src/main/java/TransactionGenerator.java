@@ -11,7 +11,7 @@ instantiate parameters. The implementation's effective instantiated parameters m
 not necessarily the same.
  */
 
-import utils.CSVUtil;
+import utils.CustomCSVReader;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -55,7 +55,7 @@ public class TransactionGenerator {
 
             while ((line = reader.readLine()) != null) {
 //                randomIDList.add(line)
-                randomIDList.add(generateRandomAlphaNumeric(CSVUtil.parseCSVLine(line)));
+                randomIDList.add(generateRandomAlphaNumeric(CustomCSVReader.parseCSVLine(line)));
             }
 
             reader.close(); // Close reader
