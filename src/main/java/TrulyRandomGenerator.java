@@ -41,13 +41,14 @@ public class TrulyRandomGenerator {
     }
 
     private StringBuilder generate(String userString) throws IOException {
+        // TODO: QRBG returns NoSuchAlgorithm Exception. Look at QRBG or TRNG documentation to implement with secure random
         QRBG qrbgRandomGenerator = new QRBG(get("username"), get("password"));
         byte[] userBytes = userString.getBytes(StandardCharsets.UTF_16);
         int idLength = 24;
         StringBuilder alphaNumerics = new StringBuilder(idLength);
 
         try{
-            SecureRandom.getInstance("RJGODOY", "QRBG");
+            SecureRandom.getInstance("QRBG", "RJGODOY");
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             e.printStackTrace();
         }
@@ -65,7 +66,7 @@ public class TrulyRandomGenerator {
         return alphaNumerics;
     }
 
-    private String get(String property) throws IOException{
+    public String get(String property) throws IOException{
         Properties prop = new Properties();
         String propFileName = "config.properties";
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);

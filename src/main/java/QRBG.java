@@ -279,7 +279,9 @@ public class QRBG
     public static void main(String[] args) 
 	throws IOException, ServiceDeniedException
     {
-       QRBG random = new QRBG("username", "password");
+    	TrulyRandomGenerator tr = new TrulyRandomGenerator();
+    	System.out.println(tr.get("username") + tr.get("password"));
+       QRBG random = new QRBG(tr.get("username"), tr.get("password"));
        //print the alphabetical characters contained in ten thousand random bytes 
        int i = 10000;
        byte[] b = new byte[1];
