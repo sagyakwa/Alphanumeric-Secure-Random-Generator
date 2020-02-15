@@ -33,7 +33,7 @@ public class TransactionGenerator {
     }
 
     /*
-    Using the Custom CSV class, reading the 1 million samples to 1.03 seconds average
+    Using the Custom CSV class, reading the 1.5 million samples to 0.46 seconds average
     This includes reading the file twice (to initialize ArrayList).
      */
 
@@ -54,7 +54,6 @@ public class TransactionGenerator {
             reader.readLine();  // Skip first line as it's the header
 
             while ((line = reader.readLine()) != null) {
-//                randomIDList.add(line)
                 randomIDList.add(generateRandomAlphaNumeric(CustomCSVReader.parseCSVLine(line)));
             }
 
@@ -78,6 +77,7 @@ public class TransactionGenerator {
         StringBuilder stringBuilder = new StringBuilder(idLength);
 
         // set the SecureRandom algorithm to DRBG, with 256 bits of security strength, Prediction resistance + reseeding,
+        // which means it's unpredictable as long as the seed is unknown,
         // while using the customer info bits as a personalization string. The personalization string is combined with a
         // secret entropy input and (possibly) a nonce to produce a seed for the secure random generation
         try {
