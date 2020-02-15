@@ -3,11 +3,11 @@ package utils;
 /**
  * The purpose of this program is to read and parse csv files, taking into account custom separators, or double quotes.
  */
-public class CSVUtil {
+public class CustomCSVReader {
     private static final char SEPARATOR_CHAR = ',';
     private static final char QUOTE_CHAR = '"';
 
-    public CSVUtil() {
+    public CustomCSVReader() {
     }
 
     /**
@@ -51,23 +51,24 @@ public class CSVUtil {
 
         StringBuffer curVal = new StringBuffer();
         boolean isInQuotes = false;
-        boolean startCollectingChar = false;
-        boolean doubleQuotesInColumn = false;
+        boolean collectChar = false;
+        boolean isDoubleQuotesInColumn = false;
 
-        char[] chars = cvsLine.toCharArray();
+        char[] csvCharArray = cvsLine.toCharArray();
 
-        for (char ch : chars) {
+        for (char ch : csvCharArray) {
+            // Check if in quotes
             if (isInQuotes) {
-                startCollectingChar = true;
+                collectChar = true;
                 if (ch == customQuote) {
                     isInQuotes = false;
-                    doubleQuotesInColumn = false;
+                    isDoubleQuotesInColumn = false;
                 } else {
                     // Check and allow "" in custom quote enclosed
                     if (ch == '\"') {
-                        if (!doubleQuotesInColumn) {
+                        if (!isDoubleQuotesInColumn) {
                             curVal.append(ch);
-                            doubleQuotesInColumn = true;
+                            isDoubleQuotesInColumn = true;
                         }
                     } else {
                         curVal.append(ch);
@@ -79,12 +80,12 @@ public class CSVUtil {
                     isInQuotes = true;
 
                     // Check and llow "" in empty quote enclosed
-                    if (chars[0] != '"' && customQuote == '\"') {
+                    if (csvCharArray[0] != '"' && customQuote == '\"') {
                         curVal.append('"');
                     }
 
                     // Double quotes in column will hit this!
-                    if (startCollectingChar) {
+                    if (collectChar) {
                         curVal.append('"');
                     }
 
@@ -93,7 +94,7 @@ public class CSVUtil {
                     result.append(curVal.toString());
 
                     curVal = new StringBuffer();
-                    startCollectingChar = false;
+                    collectChar = false;
 
                 } else if (ch != '\r') {
                     if (ch == '\n') {
