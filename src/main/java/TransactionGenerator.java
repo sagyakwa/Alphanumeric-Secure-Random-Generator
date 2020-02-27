@@ -30,10 +30,14 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 
 public class TransactionGenerator {
 
+    private long counter = 1;
     private SecureRandom secureRandom = new SecureRandom();
 
     public TransactionGenerator() {
@@ -52,6 +56,7 @@ public class TransactionGenerator {
      */
     // Read data from CSV File and generate random IDs in a list
     protected List<StringBuilder> generateRandomIDs(String csvFilePath, boolean withHeader) throws IOException {
+        writeLog("Creating initial capacity for array list");
         int initialCapacity = (int) Files.lines(Paths.get(csvFilePath)).count(); // get size of csv
         List<StringBuilder> randomIDList = new ArrayList<>(initialCapacity);  // Default to empty list
         String line;
@@ -62,15 +67,20 @@ public class TransactionGenerator {
             reader.readLine();  // Skip first line as it's the header
 
             while ((line = reader.readLine()) != null) {
+                writeLog("Getting ready to read CSV file line by line ");
                 randomIDList.add(generateRandomAlphaNumeric(CustomCSVReader.parseCSVLine(line)));
+                this.counter++;
             }
 
+            writeLog("Closing our buffered reader");
             reader.close(); // Close reader
         } catch (IOException | InvalidAlgorithmParameterException e) {
+            writeLog(e.toString());
             e.printStackTrace();
         }
 
 
+        writeLog("Returning our array list of 24 alphanumeric characters");
         return randomIDList;
     }
 
@@ -101,13 +111,16 @@ public class TransactionGenerator {
         StringBuilder stringBuilder = new StringBuilder(idLength);
 
         // Put customer string through the DRBG generation
+        writeLog("Setting DRBG algorithm");
         try {
             SecureRandom.getInstance("DRBG", DrbgParameters.instantiation(256, DrbgParameters.Capability.PR_AND_RESEED, customerInfoString.getBytes(StandardCharsets.UTF_16)));
         } catch (NoSuchAlgorithmException e) {
+            writeLog(e.toString());
             e.printStackTrace();
         }
 
         // Go through and make 24 alphanumeric string
+        writeLog("Line " + this.counter + ": Generating 24 alphanumeric character");
         for (int i = 0; i < idLength; i++) {
             String acceptedSymbols = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789";
             int randCharAt = this.secureRandom.nextInt(acceptedSymbols.length());
@@ -125,27 +138,24 @@ public class TransactionGenerator {
      *
      * @param data the data you want written
      */
+    // TODO: java.io.IOException: Couldn't get lock for src/main/resources/Log.log due to concurent writing to file maybe
     private static void writeLog(String data) {
-        System.out.println(data);
+        Logger logger = Logger.getLogger("Generator Logs");
+        FileHandler fileHandler;
 
-        File file = new File("src/main/resources/log.txt");
-        FileWriter fr = null;
-        BufferedWriter br = null;
-        try{
-            fr = new FileWriter(file);
-            br = new BufferedWriter(fr);
+        try {
+            // Configure the logger with handler and formatter
+            fileHandler = new FileHandler("src/main/resources/Log.log");
+            logger.addHandler(fileHandler);
+            SimpleFormatter formatter = new SimpleFormatter();
+            fileHandler.setFormatter(formatter);
 
-            br.write(data);
-        } catch (IOException e) {
+            // Log messages
+            logger.info(data);
+
+        } catch (SecurityException | IOException e) {
             e.printStackTrace();
-        }finally{
-            try {
-                assert br != null;
-                br.close();
-                fr.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
+
     }
 }
