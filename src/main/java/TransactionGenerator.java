@@ -16,7 +16,6 @@
  of the random generation.
  */
 
-// TODO: Add logging
 
 import utils.CustomCSVReader;
 
@@ -25,23 +24,20 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.DrbgParameters;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 
 public class TransactionGenerator {
 
-    private long counter = 1;
-    private SecureRandom secureRandom = new SecureRandom();
+    private int counter;
+    private SecureRandom secureRandom;
 
     public TransactionGenerator() {
-
+        this.counter = 0;
+        this.secureRandom = new SecureRandom();
     }
 
 
@@ -57,24 +53,29 @@ public class TransactionGenerator {
     // Read data from CSV File and generate random IDs in a list
     protected List<StringBuilder> generateRandomIDs(String csvFilePath, boolean withHeader) throws IOException {
         writeLog("Creating initial capacity for array list");
-        int initialCapacity = (int) Files.lines(Paths.get(csvFilePath)).count(); // get size of csv
-        List<StringBuilder> randomIDList = new ArrayList<>(initialCapacity);  // Default to empty list
+        // Get size of csv
+        int initialCapacity = (int) Files.lines(Paths.get(csvFilePath)).count();
+        // Set initial capacity of our list using the size of the csv file
+        List<StringBuilder> randomIDList = new ArrayList<>(initialCapacity);
         String line;
+
+        writeLog("Getting ready to read CSV file line by line ");
+        writeLog("Setting Secure Random Algorithm to DRBG");
 
         try {
             // Read CSV file. For each row make random id for each line
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(Paths.get(csvFilePath).toString()))));
-            reader.readLine();  // Skip first line as it's the header
+            if(withHeader) // Treat the first line as a header
+                reader.readLine();
 
             while ((line = reader.readLine()) != null) {
-                writeLog("Getting ready to read CSV file line by line ");
-                randomIDList.add(generateRandomAlphaNumeric(CustomCSVReader.parseCSVLine(line)));
                 this.counter++;
+                randomIDList.add(generateRandomAlphaNumeric(CustomCSVReader.parseCSVLine(line)));
             }
 
             writeLog("Closing our buffered reader");
-            reader.close(); // Close reader
-        } catch (IOException | InvalidAlgorithmParameterException e) {
+            reader.close(); // Close buffered reader
+        } catch (IOException e) {
             writeLog(e.toString());
             e.printStackTrace();
         }
@@ -85,7 +86,7 @@ public class TransactionGenerator {
     }
 
     /**
-     * Overload function for withHeader parameter's default value (true)
+     * Overload function to set default parameter value for withHeader to true
      *
      * @param csvFilePath is the String path of the CSV file
      * @return ArrayList of random alphanumerics
@@ -105,13 +106,12 @@ public class TransactionGenerator {
      * @return String of secure random alphanumeric
      */
     // Implementation of random alphanumeric string containing 24 characters (no special characters)
-    protected StringBuilder generateRandomAlphaNumeric(String customerInfoString) throws InvalidAlgorithmParameterException{
+    protected StringBuilder generateRandomAlphaNumeric(String customerInfoString){
         // Set length of random alphanumeric
         int idLength = 24;
         StringBuilder stringBuilder = new StringBuilder(idLength);
 
         // Put customer string through the DRBG generation
-        writeLog("Setting DRBG algorithm");
         try {
             SecureRandom.getInstance("DRBG", DrbgParameters.instantiation(256, DrbgParameters.Capability.PR_AND_RESEED, customerInfoString.getBytes(StandardCharsets.UTF_16)));
         } catch (NoSuchAlgorithmException e) {
@@ -130,32 +130,16 @@ public class TransactionGenerator {
         }
 
 
+        writeLog("Done with generation!");
         return stringBuilder;
     }
 
     /**
-     * Uses internal buffer to reduce real IO operations and saves time. Prints to console as well
+     * Basic logging to console
      *
-     * @param data the data you want written
+     * @param data the data you want appended to your log file
      */
-    // TODO: java.io.IOException: Couldn't get lock for src/main/resources/Log.log due to concurent writing to file maybe
-    private static void writeLog(String data) {
-        Logger logger = Logger.getLogger("Generator Logs");
-        FileHandler fileHandler;
-
-        try {
-            // Configure the logger with handler and formatter
-            fileHandler = new FileHandler("src/main/resources/Log.log");
-            logger.addHandler(fileHandler);
-            SimpleFormatter formatter = new SimpleFormatter();
-            fileHandler.setFormatter(formatter);
-
-            // Log messages
-            logger.info(data);
-
-        } catch (SecurityException | IOException e) {
-            e.printStackTrace();
-        }
-
+    private void writeLog(String data) {
+        System.out.println(data);
     }
 }
