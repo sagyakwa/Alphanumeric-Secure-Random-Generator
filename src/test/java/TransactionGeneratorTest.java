@@ -53,7 +53,7 @@ public class TransactionGeneratorTest {
     public void generateUsingTextFile() {
         TransactionGenerator tr = new TransactionGenerator();
         try {
-            tr.generateRandomIDs("src/main/java/Sample.txt");
+            System.out.println(tr.generateRandomIDs("src/main/java/Sample.txt"));
         } catch(IOException e){
             System.out.println("Doesn't exist");
         }
