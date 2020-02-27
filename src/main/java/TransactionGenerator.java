@@ -9,7 +9,14 @@ continuously receives entropy from /dev/urandom, unlike the other PRNGs, but you
 The DRBG implementation in Java 9+ returns a SecureRandom object of the specific algorithm supporting the specific
 instantiate parameters. The implementation's effective instantiated parameters must match this minimum request but is
 not necessarily the same.
+
+
+In this application, for every row in the cvs file, the information is put into an arraylist of stringbuilders, in the
+generateRandomIDs method. The generateRandomAlphaNumeric method then takes it in as a string and adds it to the reseeding
+of the random generation.
  */
+
+// TODO: Add logging
 
 import utils.CustomCSVReader;
 
@@ -18,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.DrbgParameters;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -50,7 +58,7 @@ public class TransactionGenerator {
 
         try {
             // Read CSV file. For each row make random id for each line
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(csvFilePath))));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(Paths.get(csvFilePath).toString()))));
             reader.readLine();  // Skip first line as it's the header
 
             while ((line = reader.readLine()) != null) {
@@ -58,7 +66,7 @@ public class TransactionGenerator {
             }
 
             reader.close(); // Close reader
-        } catch (IOException e) {
+        } catch (IOException | InvalidAlgorithmParameterException e) {
             e.printStackTrace();
         }
 
@@ -71,7 +79,7 @@ public class TransactionGenerator {
      * @return String of secure random alphanumeric
      */
     // Implementation of random alphanumeric string containing 24 characters (no special characters)
-    private StringBuilder generateRandomAlphaNumeric(String customerInfoString) {
+    protected StringBuilder generateRandomAlphaNumeric(String customerInfoString) throws InvalidAlgorithmParameterException{
         // Set length of random alphanumeric
         int idLength = 24;
         StringBuilder stringBuilder = new StringBuilder(idLength);
@@ -97,5 +105,33 @@ public class TransactionGenerator {
 
 
         return stringBuilder;
+    }
+
+    /**
+     * Uses internal buffer to reduce real IO operations and saves time
+     * @param data the data you want written
+     */
+    private static void writeLog(String data) {
+        System.out.println(data);
+
+        File file = new File("src/main/resources/log.txt");
+        FileWriter fr = null;
+        BufferedWriter br = null;
+        try{
+            fr = new FileWriter(file);
+            br = new BufferedWriter(fr);
+
+            br.write(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally{
+            try {
+                assert br != null;
+                br.close();
+                fr.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
