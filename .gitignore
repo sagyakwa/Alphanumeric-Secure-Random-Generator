@@ -138,3 +138,4 @@ gradle-app.setting
 ### Custom ###
 /src/main/resources/config.properties
 src/main/resources/Log.log
+/.idea/
