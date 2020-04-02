@@ -58,4 +58,16 @@ public class TransactionGeneratorTest {
             System.out.println("Doesn't exist");
         }
     }
+
+    @Test
+    public void generateRandomIDs() {
+    }
+
+    @Test
+    public void testGenerateRandomIDs() {
+    }
+
+    @Test
+    public void generateRandomAlphaNumeric() {
+    }
 }

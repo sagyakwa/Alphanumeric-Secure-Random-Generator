@@ -1,3 +1,9 @@
+/*
+ Author: Samuel Agyakwa
+ Date: 02/20/2020
+
+ Main class
+ */
 import java.io.IOException;
 
 public class Main {
