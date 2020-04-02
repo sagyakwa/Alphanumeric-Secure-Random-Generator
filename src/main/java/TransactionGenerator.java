@@ -35,10 +35,13 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 
+/**
+ * Transaction Generator class implementation
+ */
 public class TransactionGenerator {
 
-    private int cvsLineCounter;
-    private SecureRandom secureRandomObject;
+    private int cvsLineCounter;  // To count csv lines and print to log
+    private SecureRandom secureRandomObject; // Instantiation of our SecureRandom object
 
     /**
      * Constructor that sets our counter for the csv lines, and creates a new SecureRandom instance.
@@ -55,25 +58,28 @@ public class TransactionGenerator {
      * This includes reading the file twice (to initialize ArrayList).
      *
      * @param csvFilePath is the String path of the CSV file
+     * @param withHeader is a boolean value to be set if your CSV file has a header line (the first line)
      * @return an ArrayList of random alphanumerics
      * @throws IOException in case CSV file doesn't exist, or there are any IO errors
      */
     // Read data from CSV File and generate random IDs in a list
     protected List<StringBuilder> generateRandomIDs(String csvFilePath, boolean withHeader) throws IOException {
-        writeToLog("Creating initial capacity for array list");
-        // Get size of csv
+        // Logging
+        logToConsole("Creating initial capacity for array list");
+        // Get size of CSV
         int initialCapacity = (int) Files.lines(Paths.get(csvFilePath)).count();
-        // Set initial capacity of our list using the size of the csv file
+        // Set initial capacity of our list using the size of the CSV file
         List<StringBuilder> randomIDList = new ArrayList<>(initialCapacity);
         String line;
 
-        writeToLog("Getting ready to read CSV file line by line ");
-        writeToLog("Setting Secure Random Algorithm to DRBG");
+        // Logging
+        logToConsole("Getting ready to read CSV file line by line ");
+        logToConsole("Setting Secure Random Algorithm to DRBG");
 
         try {
             // Read CSV file. For each row make random id for each line
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(Paths.get(csvFilePath).toString()))));
-            if(withHeader) // Treat the first line as a header
+            if (withHeader) // Treat the first line as a header
                 reader.readLine();
 
             while ((line = reader.readLine()) != null) {
@@ -81,20 +87,22 @@ public class TransactionGenerator {
                 randomIDList.add(generateRandomAlphaNumeric(CustomCSVReader.parseCSVLine(line)));
             }
 
-            writeToLog("Closing our buffered reader");
+            // Logging
+            logToConsole("Closing our buffered reader");
             reader.close(); // Close buffered reader
         } catch (IOException e) {
-            writeToLog(e.toString());
+            // Logging
+            logToConsole(e.toString());
             e.printStackTrace();
         }
 
-
-        writeToLog("Returning our array list of 24 alphanumeric characters");
+        // Logging
+        logToConsole("Returning our array list of 24 alphanumeric characters");
         return randomIDList;
     }
 
     /**
-     * Overload function to set default parameter value for withHeader equal to true
+     * Overloaded function to set default parameter value for withHeader equal to true
      *
      * @param csvFilePath is the String path of the CSV file
      * @return an ArrayList object of all generated random alphanumeric ID numbers
@@ -115,7 +123,7 @@ public class TransactionGenerator {
      */
     // Implementation of random alphanumeric string containing 24 characters (no special characters)
     @NotNull
-    protected final StringBuilder generateRandomAlphaNumeric(String customerInfoString){
+    protected final StringBuilder generateRandomAlphaNumeric(String customerInfoString) {
         // Set length of random alphanumeric
         final int maxIDLength = 24;
         StringBuilder randomAlphanumericID = new StringBuilder(maxIDLength);
@@ -124,31 +132,33 @@ public class TransactionGenerator {
         try {
             new AtomicReference<>(SecureRandom.getInstance("DRBG", DrbgParameters.instantiation(256, DrbgParameters.Capability.PR_AND_RESEED, customerInfoString.getBytes(StandardCharsets.UTF_16))));
         } catch (NoSuchAlgorithmException e) {
-            writeToLog(e.toString());
+            // Logging
+            logToConsole(e.toString());
             e.printStackTrace();
         }
 
+        // Logging
+        logToConsole("Line " + this.cvsLineCounter + ": Generating 24 alphanumeric character");
         // Go through and make 24 alphanumeric string
-        writeToLog("Line " + this.cvsLineCounter + ": Generating 24 alphanumeric character");
         for (int i = 0; i < maxIDLength; i++) {
-            String acceptedSymbols = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789";
-            int randCharAt = secureRandomObject.nextInt(acceptedSymbols.length());
-            char randChar = acceptedSymbols.charAt(randCharAt);
+            String acceptedCharacters = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789";
+            int randCharAt = secureRandomObject.nextInt(acceptedCharacters.length());
+            char randChar = acceptedCharacters.charAt(randCharAt);
 
             randomAlphanumericID.append(randChar);
         }
 
-
-        writeToLog("Done with generation!");
+        // Logging
+        logToConsole("Done with generation!");
         return randomAlphanumericID;
     }
 
     /**
      * Basic logging to the console. Console logging instead of File Logging is fine.
      *
-     * @param data is the data you want to print out to the console
+     * @param dataToPrint is the string you want to print out to the console
      */
-    private void writeToLog(String data) {
-        System.out.println(data);
+    private void logToConsole(String dataToPrint) {
+        System.out.println(dataToPrint);
     }
 }
