@@ -9,7 +9,7 @@ public class TransactionGeneratorTest {
         TransactionGenerator tr = new TransactionGenerator();
         try {
             long startTime = System.nanoTime();
-            System.out.println(tr.generateRandomIDs("src/main/java/customers.csv"));
+            System.out.println(tr.generateAllAlphaNumericID("src/main/java/customers.csv"));
             long endTime = System.nanoTime();
             long elapsedTime = endTime - startTime;
             double elapsedTimeInSeconds = (double) Long.parseLong(String.valueOf(elapsedTime)) / 1_000_000_000;
@@ -24,7 +24,7 @@ public class TransactionGeneratorTest {
         TransactionGenerator tr = new TransactionGenerator();
         try {
             long startTime = System.nanoTime();
-            System.out.println(tr.generateRandomIDs("src/main/java/customers.csv", false));
+            System.out.println(tr.generateAllAlphaNumericID("src/main/java/customers.csv", false));
             long endTime = System.nanoTime();
             long elapsedTime = endTime - startTime;
             double elapsedTimeInSeconds = (double) Long.parseLong(String.valueOf(elapsedTime)) / 1_000_000_000;
@@ -39,7 +39,7 @@ public class TransactionGeneratorTest {
         TransactionGenerator tr = new TransactionGenerator();
         try {
             long startTime = System.nanoTime();
-            System.out.println(tr.generateRandomIDs("src/main/java/36_635 row sample.csv"));
+            System.out.println(tr.generateAllAlphaNumericID("src/main/java/36_635 row sample.csv"));
             long endTime = System.nanoTime();
             long elapsedTime = endTime - startTime;
             double elapsedTimeInSeconds = (double) Long.parseLong(String.valueOf(elapsedTime)) / 1_000_000_000;
@@ -54,7 +54,7 @@ public class TransactionGeneratorTest {
         TransactionGenerator tr = new TransactionGenerator();
         try {
             long startTime = System.nanoTime();
-            System.out.println(tr.generateRandomIDs("src/main/java/500_000 Sales Records.csv"));
+            System.out.println(tr.generateAllAlphaNumericID("src/main/java/500_000 Sales Records.csv"));
             long endTime = System.nanoTime();
             long elapsedTime = endTime - startTime;
             double elapsedTimeInSeconds = (double) Long.parseLong(String.valueOf(elapsedTime)) / 1_000_000_000;
