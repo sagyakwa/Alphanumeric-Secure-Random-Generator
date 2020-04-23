@@ -63,7 +63,7 @@ public class TransactionGenerator {
      * @throws IOException in case CSV file doesn't exist, or there are any IO errors
      */
     // Read data from CSV File and generate random IDs in a list
-    protected List<StringBuilder> generateRandomIDs(String csvFilePath, boolean withHeader) throws IOException {
+    protected List<StringBuilder> generateAllAlphaNumericID(String csvFilePath, boolean withHeader) throws IOException {
         // Logging
         logToConsole("Creating initial capacity for array list");
         // Get size of CSV
@@ -84,7 +84,7 @@ public class TransactionGenerator {
 
             while ((line = reader.readLine()) != null) {
                 this.cvsLineCounter++;
-                randomIDList.add(generateRandomAlphaNumeric(CustomCSVReader.parseCSVLine(line)));
+                randomIDList.add(generateRandomAlphaNumericString(CustomCSVReader.parseCSVLine(line)));
             }
 
             // Logging
@@ -108,8 +108,8 @@ public class TransactionGenerator {
      * @return an ArrayList object of all generated random alphanumeric ID numbers
      * @throws IOException in case CSV file doesn't exist, or there are any IO errors
      */
-    protected List<StringBuilder> generateRandomIDs(String csvFilePath) throws IOException {
-        return generateRandomIDs(csvFilePath, true);
+    protected List<StringBuilder> generateAllAlphaNumericID(String csvFilePath) throws IOException {
+        return generateAllAlphaNumericID(csvFilePath, true);
     }
 
     /**
@@ -123,7 +123,7 @@ public class TransactionGenerator {
      */
     // Implementation of random alphanumeric string containing 24 characters (no special characters)
     @NotNull
-    protected final StringBuilder generateRandomAlphaNumeric(String customerInfoString) {
+    protected final StringBuilder generateRandomAlphaNumericString(String customerInfoString) {
         // Set length of random alphanumeric
         final int maxIDLength = 24;
         StringBuilder randomAlphanumericID = new StringBuilder(maxIDLength);
@@ -143,13 +143,13 @@ public class TransactionGenerator {
         for (int i = 0; i < maxIDLength; i++) {
             String acceptedCharacters = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789";
             int randCharAt = secureRandomObject.nextInt(acceptedCharacters.length());
-            char randChar = acceptedCharacters.charAt(randCharAt);
+            char randomCharacter = acceptedCharacters.charAt(randCharAt);
 
-            randomAlphanumericID.append(randChar);
+            randomAlphanumericID.append(randomCharacter);
         }
 
         // Logging
-        logToConsole("Done with generation!");
+        logToConsole("Done with generations!");
         return randomAlphanumericID;
     }
 
