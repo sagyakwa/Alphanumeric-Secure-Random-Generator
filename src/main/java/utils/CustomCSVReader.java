@@ -40,7 +40,7 @@ public class CustomCSVReader {
      */
     public static StringBuilder parseCSVLine(String cvsLine, char separator, char customQuote) {
 
-        StringBuilder result = new StringBuilder();
+        StringBuilder finalStringResult = new StringBuilder();
 
         // if empty, return!
         assert cvsLine != null;
@@ -101,7 +101,7 @@ public class CustomCSVReader {
                 }
                 else if (currentCharacter == separator) {
 
-                    result.append(stringValue.toString());
+                    finalStringResult.append(stringValue.toString());
 
                     stringValue = new StringBuffer();
                     collectChar = false;
@@ -119,9 +119,9 @@ public class CustomCSVReader {
             }
         }
 
-        result.append(stringValue.toString());
+        finalStringResult.append(stringValue.toString());
 
-        return result;
+        return finalStringResult;
     }
 
 }
