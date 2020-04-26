@@ -11,7 +11,7 @@
  continuously receives entropy from /dev/urandom, unlike the other PRNGs, but you sacrifice stability.
  The DRBG implementation in Java 9+ returns a SecureRandom object of the specific algorithm supporting the specific
  instantiate parameters. The implementation's effective instantiated parameters must match this minimum request but is
- not necessarily the same.
+ not necessarily the same. Language level should be set to Level 9.
 
 
  In this application, for every row in the cvs file, the information is put into an ArrayList of StringBuilder objects, in the
@@ -124,7 +124,7 @@ public class TransactionGenerator {
      * while using the customer info bits as a personalization string. The personalization string is combined with a
      * secret entropy input and (possibly) a nonce to produce a seed for the secure random generation.
      *
-     * @param customerInfoString is the String of the customer's information, via return from the CustomCSVReader class
+     * @param customerInfoString is the String of the customer's information, using it as bits.
      * @param withLogging        is the boolean value if we should log or simply return an ID
      * @return a StringBuilder object containing a 24 alphanumeric secure random ID
      */

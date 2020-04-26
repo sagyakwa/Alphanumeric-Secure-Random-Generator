@@ -21,7 +21,7 @@ public class Main {
 
         try {
             System.out.println(tr.generateRandomAlphaNumericString("\n \t â, ê, î, ô, û type a"));
-            System.out.println(tr.generateRandomAlphaNumericString("片仮名字"));
+            System.out.println(tr.generateRandomAlphaNumericString("`132wuawdf8o4r=-[];'.f \\/**+`"));
         } catch (NoSuchAlgorithmException | NoSuchProviderException | IllegalArgumentException e) {
             System.out.println("Invalid Algorithm has been set");
         }
