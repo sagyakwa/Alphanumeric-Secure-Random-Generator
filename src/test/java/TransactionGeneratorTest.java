@@ -24,7 +24,7 @@ public class TransactionGeneratorTest {
         TransactionGenerator tr = new TransactionGenerator();
         try {
             long startTime = System.nanoTime();
-            System.out.println(tr.generateAllAlphaNumericID("src/main/java/customers.csv", false));
+            System.out.println(tr.generateAllAlphaNumericID("src/main/java/customers.csv", false, true));
             long endTime = System.nanoTime();
             long elapsedTime = endTime - startTime;
             double elapsedTimeInSeconds = (double) Long.parseLong(String.valueOf(elapsedTime)) / 1_000_000_000;
@@ -64,15 +64,4 @@ public class TransactionGeneratorTest {
         }
     }
 
-    @Test
-    public void generateRandomIDs() {
-    }
-
-    @Test
-    public void testGenerateRandomIDs() {
-    }
-
-    @Test
-    public void generateRandomAlphaNumeric() {
-    }
 }
