@@ -1,23 +1,23 @@
 /*
- Author: Samuel Agyakwa
- Date: 02/20/2020
+Author: Samuel Agyakwa
+Date: 02/20/2020
 
- The purpose of this program is to generate a secure 24 alphanumerical digit number. Since Math.Random() and the Random()
- implementations use a linear congruential generator (LCG), it is not cryptographically strong. The SecureRandom implementation
- from java.security.SecureRandom uses a cryptographically strong pseudo-random number generator (CSPRNG)
- suited for a thread safe, true random generator. On Windows, the default implementation for SecureRandom is SHA1PRNG on
- Windows, and on Linux/Solaris/Mac, the default implementation is NativePRNG. SHA1PRNG can be 17 times fater than NativePRNG,
- but seeding options are fixed. Another implementation is AESCounterRNG, which is 10x faster than SHA1PRNG, and also
- continuously receives entropy from /dev/urandom, unlike the other PRNGs, but you sacrifice stability.
- The DRBG implementation in Java 9+ returns a SecureRandom object of the specific algorithm supporting the specific
- instantiate parameters. The implementation's effective instantiated parameters must match this minimum request but is
- not necessarily the same. Language level should be set to Level 9.
+The purpose of this program is to generate a secure 24 alphanumerical digit number. Since Math.Random() and the Random()
+implementations use a linear congruential generator (LCG), it is not cryptographically strong. The SecureRandom implementation
+from java.security.SecureRandom uses a cryptographically strong pseudo-random number generator (CSPRNG)
+suited for a thread safe, true random generator. On Windows, the default implementation for SecureRandom is SHA1PRNG on
+Windows, and on Linux/Solaris/Mac, the default implementation is NativePRNG. SHA1PRNG can be 17 times fater than NativePRNG,
+but seeding options are fixed. Another implementation is AESCounterRNG, which is 10x faster than SHA1PRNG, and also
+continuously receives entropy from /dev/urandom, unlike the other PRNGs, but you sacrifice stability.
+The DRBG is based on a DRBG mechanism as specified in this Recommendation and includes a source of randomness.
+The DRBG mechanism uses an algorithm (i.e., a DRBG algorithm) that produces a sequence of bits from an initial value that
+is determined by a seed that is determined from the output of the randomness source."
 
 
- In this application, for every row in the cvs file, the information is put into an ArrayList of StringBuilder objects, in the
- generateRandomIDs method. The generateRandomAlphaNumeric method then takes it in as a string and adds it to the reseeding
- of the random generation.
- */
+In this application, for every row in the cvs file, the information is put into an ArrayList of StringBuilder objects, in the
+generateRandomIDs method. The generateRandomAlphaNumeric method then takes it in as a string and adds it to the reseeding
+of the random generation.
+*/
 
 
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +33,6 @@ import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -59,7 +58,7 @@ public class TransactionGenerator {
      * @param csvFilePath is the String path of the CSV file
      * @param withHeader  is a boolean value to be set if your CSV file has a header line (the first line)
      * @param withLogging is a boolean value to determine if we should log to our console
-     * @return an ArrayList of random alphanumerics
+     * @return an ArrayList of StringBuilder objects of all generated random alphanumeric ID numbers
      * @throws IOException in case CSV file doesn't exist, or there are any IO errors
      */
     // Read data from CSV File and generate random IDs in a list
@@ -111,7 +110,7 @@ public class TransactionGenerator {
      * be skipped, and it has no logging.
      *
      * @param csvFilePath is the String path of the CSV file
-     * @return an ArrayList object of all generated random alphanumeric ID numbers
+     * @return an ArrayList of StringBuilder objects of all generated random alphanumeric ID numbers
      * @throws IOException in case CSV file doesn't exist, or there are any IO errors
      */
     protected List<StringBuilder> generateAllAlphaNumericID(String csvFilePath) throws IOException {
@@ -125,8 +124,13 @@ public class TransactionGenerator {
      * secret entropy input and (possibly) a nonce to produce a seed for the secure random generation.
      *
      * @param customerInfoString is the String of the customer's information, using it as bits.
-     * @param withLogging        is the boolean value if we should log or simply return an ID
+     * @param withLogging is the boolean value if we should log or simply return an ID
      * @return a StringBuilder object containing a 24 alphanumeric secure random ID
+     * @throws NoSuchAlgorithmException if a SecureRandomSpi implementation for the specified algorithm is not available
+     * from the specified provider.
+     * @throws NoSuchProviderException  if a SecureRandomSpi implementation for the specified algorithm is not available
+     * from the specified Provider object.
+     * @throws IllegalArgumentException if the specified provider is null.
      */
 
     // Implementation of random alphanumeric string containing 24 characters (no special characters)
@@ -139,8 +143,8 @@ public class TransactionGenerator {
 
         // Put customer string through the DRBG generation
         try {
-            new AtomicReference<>(SecureRandom.getInstance("DRBG", DrbgParameters.instantiation(256,
-                    DrbgParameters.Capability.PR_AND_RESEED, customerInfoString.getBytes(StandardCharsets.UTF_16))));
+            SecureRandom.getInstance("DRBG", DrbgParameters.instantiation(256,
+                    DrbgParameters.Capability.PR_AND_RESEED, customerInfoString.getBytes(StandardCharsets.UTF_16)));
         } catch (NoSuchAlgorithmException e) {
             // Logging
             if (withLogging) logToConsole(e.toString());
