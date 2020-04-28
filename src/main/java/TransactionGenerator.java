@@ -13,6 +13,43 @@ The DRBG is based on a DRBG mechanism as specified in this Recommendation and in
 The DRBG mechanism uses an algorithm (i.e., a DRBG algorithm) that produces a sequence of bits from an initial value that
 is determined by a seed that is determined from the output of the randomness source."
 
+A nonce may be required in the construction of a seed during instantation in order to
+provide a security cushion to block certain attacks. The nonce shall be either:
+a. A value with at least (1/2 security_strength) bits of entropy,
+b. A value that is expected to repeat no more often than a (1/2 security_strength)-bit
+random string would be expected to repeat.
+For case a, the nonce may be acquired from the same source and at the same time as the
+entropy input. In this case, the seed could be considered to be constructed from an "extra
+strong" entropy input and the optional personalization string, where the entropy for the
+entropy input is equal to or greater than (3/2 security_strength) bits.
+The nonce provides greater assurance that the DRBG provides security_strength bits of
+security to the consuming application. When a DRBG is instantiated many times without a
+nonce, a compromise may become more likely. In some consuming applications, a single
+DRBG compromise may reveal long-term secrets (e.g., a compromise of the DSA permessage secret may reveal the signing key).
+
+During instantiation, a personalization string should be used to derive the seed. The intent of a personalization string is to differentiate this DRBG
+instantiation from all other instantiations that might ever be created. The personalization
+string should be set to some bitstring that is as unique as possible, and may include secret
+information. Secret information should not be used in the personalization string if it
+requires a level of protection that is greater than the intended security strength of the
+DRBG instantiation. Good choices for the personalization string contents include:
+- Device serial numbers
+- Public keys
+- USER IDENTIFICATION (What we'll be using)
+- Per-module or per-device values
+- Timestamps
+- Network addresses
+- Special key values
+- DRBG instantiation
+- Application identifiers
+- Protocol version identifiers
+- Random numbers
+- Nonces
+- Seedfiles
+
+Source -https://www.wired.com/images_blogs/threatlevel/2013/09/SP800-90A2.pdf
+
+
 
 In this application, for every row in the cvs file, the information is put into an ArrayList of StringBuilder objects, in the
 generateRandomIDs method. The generateRandomAlphaNumeric method then takes it in as a string and adds it to the reseeding
@@ -31,10 +68,11 @@ import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.Security;
 import java.security.DrbgParameters;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.security.NoSuchProviderException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,12 +84,14 @@ public class TransactionGenerator {
 
     private int cvsLineCounter;  // To count csv lines and (possibly) print to log
     private SecureRandom secureRandomObject; // Instantiation of our SecureRandom object
+    private String acceptedCharacters;
 
     /**
      * Constructor that sets our counter for the csv lines, and creates a new SecureRandom instance.
      */
     public TransactionGenerator() {
         this.cvsLineCounter = 0;
+        this.acceptedCharacters = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789";
         this.secureRandomObject = new SecureRandom();
     }
 
@@ -143,33 +183,56 @@ public class TransactionGenerator {
             throws NoSuchAlgorithmException, NoSuchProviderException, IllegalArgumentException {
         // Set length of random alphanumeric
         final short maxIDLength = 24;
+        final String HASH_DRBG = "HASH_DRBG";
+        final String HMAC_DRBG = "HMAC_DRBG";
+        final String secureRandomConfig = "securerandom.drbg.config";
+        final String secureRandomAlgorithm = "DRBG";
+        final String secureRandomProvider = "SUN";
+        final int securityStrength = 256;
         StringBuilder randomAlphanumericID = new StringBuilder(maxIDLength);
 
-        // Put customer string through the DRBG generation
-        try {
-            this.secureRandomObject = SecureRandom.getInstance("DRBG", DrbgParameters.instantiation(256,
-                    DrbgParameters.Capability.PR_AND_RESEED, customerInfoString.getBytes(StandardCharsets.UTF_16)));
+        // Try to use these two DRBG mechanisms. If those two are not available, go with whatever default is available.
+        /*
+        HMAC-DRBG shuffles things around a bit more than Hash-DRBG and HMAC itself contains two
+        hash invocations. Thus HMAC-DRBG is certainly slower. But as any possible weaknesses of HMAC will come from
+        weaknesses of the underlying hash function, HMAC can't be weaker than the hash ... but it could be stronger
+        (i.e. some weaknesses of a hash function will not transfer to the corresponding HMAC). For now, there is no
+        weakness known in either of both constructions, though.
+         */
+        // Logging
+        if (withLogging) logToConsole("Configuring Secure Random");
 
-            this.secureRandomObject.reseed();
-        } catch (NoSuchAlgorithmException e) {
-            // Logging
-            if (withLogging) logToConsole(e.toString());
-            e.printStackTrace();
+        try{
+            Security.setProperty(secureRandomConfig, HASH_DRBG);
+        } catch (IllegalArgumentException e){
+            Security.setProperty(secureRandomConfig, HMAC_DRBG);
+        } finally {
+            // Put customer string through the DRBG generation
+            try {
+                this.secureRandomObject = SecureRandom.getInstance(secureRandomAlgorithm, DrbgParameters.instantiation(securityStrength,
+                        DrbgParameters.Capability.PR_AND_RESEED, customerInfoString.getBytes(StandardCharsets.UTF_16)), secureRandomProvider);
+
+            } catch (NoSuchAlgorithmException e) {
+                // Logging
+                if (withLogging) logToConsole(e.toString());
+                e.printStackTrace();
+            }
         }
 
         // Logging
         if (withLogging) logToConsole("Line " + this.cvsLineCounter + ": Generating 24 alphanumeric character");
+
         // Go through and make 24 alphanumeric string
         for (int i = 0; i < maxIDLength; i++) {
-            String acceptedCharacters = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789";
-            int randCharAt = this.secureRandomObject.nextInt(acceptedCharacters.length()); // pick one of our accepted character's index
-            char randomCharacter = acceptedCharacters.charAt(randCharAt); // get the character at that index
+            int randCharAt = this.secureRandomObject.nextInt(this.acceptedCharacters.length()); // pick one of our accepted character's index
+            char randomCharacter = this.acceptedCharacters.charAt(randCharAt); // get the character at that index
 
             randomAlphanumericID.append(randomCharacter); // add the character to our string builder
         }
 
         // Logging
         if (withLogging) logToConsole("Done with generations!");
+
         return randomAlphanumericID;
     }
 
