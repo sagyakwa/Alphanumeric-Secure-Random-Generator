@@ -147,8 +147,10 @@ public class TransactionGenerator {
 
         // Put customer string through the DRBG generation
         try {
-            SecureRandom.getInstance("DRBG", DrbgParameters.instantiation(256,
+            this.secureRandomObject = SecureRandom.getInstance("DRBG", DrbgParameters.instantiation(256,
                     DrbgParameters.Capability.PR_AND_RESEED, customerInfoString.getBytes(StandardCharsets.UTF_16)));
+
+            this.secureRandomObject.reseed();
         } catch (NoSuchAlgorithmException e) {
             // Logging
             if (withLogging) logToConsole(e.toString());
@@ -160,7 +162,7 @@ public class TransactionGenerator {
         // Go through and make 24 alphanumeric string
         for (int i = 0; i < maxIDLength; i++) {
             String acceptedCharacters = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789";
-            int randCharAt = secureRandomObject.nextInt(acceptedCharacters.length()); // pick one of our accepted character's index
+            int randCharAt = this.secureRandomObject.nextInt(acceptedCharacters.length()); // pick one of our accepted character's index
             char randomCharacter = acceptedCharacters.charAt(randCharAt); // get the character at that index
 
             randomAlphanumericID.append(randomCharacter); // add the character to our string builder
