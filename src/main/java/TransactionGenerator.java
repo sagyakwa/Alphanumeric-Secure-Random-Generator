@@ -49,6 +49,23 @@ DRBG instantiation. Good choices for the personalization string contents include
 
 Source -https://www.wired.com/images_blogs/threatlevel/2013/09/SP800-90A2.pdf
 
+The following notes apply to the "DRBG" implementation in the SUN provider of the JDK reference implementation.
+This implementation supports the Hash_DRBG and HMAC_DRBG mechanisms with DRBG algorithm SHA-224, SHA-512/224, SHA-256,
+SHA-512/256, SHA-384 and SHA-512, and CTR_DRBG (both using derivation function and not using derivation function) with
+DRBG algorithm AES-128, AES-192 and AES-256. The mechanism name and DRBG algorithm name are determined by the security
+property securerandom.drbg.config. The default choice is Hash_DRBG with SHA-256. For each combination, the security
+strength can be requested from 112 up to the highest strength it supports. Both reseeding and prediction resistance are
+supported. Personalization string is supported through the DrbgParameters.Instantiation class and additional input is
+supported through the DrbgParameters.NextBytes and DrbgParameters.Reseed classes. If a DRBG is not instantiated with a
+DrbgParameters.Instantiation object explicitly, this implementation instantiates it with a default requested strength of
+128 bits, no prediction resistance request, and no personalization string. These default instantiation parameters can
+also be customized with the securerandom.drbg.config security property. This implementation reads fresh entropy from the
+system default entropy source determined by the security property securerandom.source. Calling SecureRandom.generateSeed(int)
+will directly read from this system default entropy source. This implementation has passed all tests included in the
+20151104 version of The DRBG Test Vectors.
+
+Source - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/DrbgParameters.html
+
 
 
 In this application, for every row in the cvs file, the information is put into an ArrayList of StringBuilder objects, in the
@@ -83,7 +100,7 @@ import java.util.List;
 public class TransactionGenerator {
 
     private int cvsLineCounter;  // To count csv lines and (possibly) print to log
-    private SecureRandom secureRandomObject; // Instantiation of our SecureRandom object
+    protected SecureRandom secureRandomObject; // Instantiation of our SecureRandom object
     private String acceptedCharacters;
 
     /**
