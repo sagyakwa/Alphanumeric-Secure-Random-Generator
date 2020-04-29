@@ -65,7 +65,6 @@ public class TransactionGeneratorTest {
             e.printStackTrace();
         }
 
-        assertThat(tr.secureRandomObject.getAlgorithm(), is("DRBG"));
         assertThat(Security.getProperty("securerandom.drbg.config") , is("HASH_DRBG"));
     }
 

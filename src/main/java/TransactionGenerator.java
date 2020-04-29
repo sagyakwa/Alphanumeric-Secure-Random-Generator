@@ -100,7 +100,7 @@ import java.util.List;
 public class TransactionGenerator {
 
     private int cvsLineCounter;  // To count csv lines and (possibly) print to log
-    protected SecureRandom secureRandomObject; // Instantiation of our SecureRandom object
+    private SecureRandom secureRandomObject; // Instantiation of our SecureRandom object
     private String acceptedCharacters;
 
     /**
