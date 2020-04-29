@@ -15,7 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class CustomCSVReaderTest {
     @Test
-    public void test_no_quote() {
+    public void testNoQuote() {
 
         String line = "10,AU,Australia";
         List<String> result = Collections.singletonList(CustomCSVReader.parseCSVLine(line));
@@ -39,7 +39,7 @@ public class CustomCSVReaderTest {
     }
 
     @Test
-    public void test_double_quotes() {
+    public void testDoubleQuotes() {
 
         String line = "\"10\",\"AU\",\"Australia\"";
         List<String> result = Collections.singletonList(CustomCSVReader.parseCSVLine(line));
