@@ -20,8 +20,8 @@ public class MainGenerator {
         }
 
         try {
-            System.out.println(tr.generateRandomAlphaNumericString("\n \t â, ê, î, ô, û type a"));
-            System.out.println(tr.generateRandomAlphaNumericString("`132wuawdf8o4r=-[];'.f \\/**+`"));
+            System.out.println("Generated single random: " + tr.generateRandomAlphaNumericString("\n \t â, ê, î, ô, û type a"));
+            System.out.println("Generated using random gibberish: " + tr.generateRandomAlphaNumericString("`132wuawdf8o4r=-[];'.f \\/**+`"));
         } catch (NoSuchAlgorithmException | NoSuchProviderException | IllegalArgumentException e) {
             System.out.println("Invalid Algorithm has been set");
         }
