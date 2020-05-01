@@ -1,4 +1,4 @@
-# Software-Engineering-Class
+# Alphanumeric Secure Random Generator
 Source code for the Software Engineering class at Framingham State, Spring 2020
 
 ## Description
