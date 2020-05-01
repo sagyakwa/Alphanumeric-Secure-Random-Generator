@@ -23,7 +23,7 @@ Prediction resistance + reseeding, which means it's unpredictable as long as the
 The customer's information bits is used as a personalization string. The personalization string in the DRBG parameters. 
 is combined with a secret entropy input and (possibly) a nonce to produce a seed for the secure random generation.
 
-## Why not a True Random Bit Generator (TRNG) or Quantom Random Bit Generator (QRBG)?
+## Why not a True Random Bit Generator (TRBG) or Quantom Random Bit Generator (QRBG)?
 Previously, it was thought about to use a TRNG or a QRBG, but from a business stand point, it has holes in it. A truly 
 random generator is impossible without some deep knowledge in hardware engineering and more money to gather natural entropy. 
 The only other way was to use the API from Random.org or the QRBG generator from the Rudjer Boskovic Institute, in Laboratory 
